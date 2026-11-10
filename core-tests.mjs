@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import * as C from './core.mjs';
+import * as R from './channel.mjs';
 
 const p=C.profile();
 let states=0;
@@ -58,3 +59,42 @@ assert.deepEqual(merged.best,p.best);
 assert.equal(merged.mute,true);
 assert.equal(merged.rewards.like,true);
 console.log('PASS '+states+' reachable states, six perfect routes, save restoration, no duplicate clears and profile merge.');
+
+const season=C.profile();
+for(const [i,course] of R.COURSES.entries()){
+  assert.equal(R.runUnlocked(season),i);
+  let s=R.newRun(i);
+  assert.equal(R.stepRun(s,1/90,true),null);
+  assert.equal(s.x,0);
+  s.phase='run';
+  for(let j=0;j<5000&&s.phase==='run';j++){
+    const target=course.gates[s.g];
+    R.stepRun(s,1/90,target?.kind!=='bridge');
+    if(j===150){
+      const snapshot=JSON.parse(JSON.stringify(s));
+      s=R.restoreRun(snapshot,season);
+      assert.equal(s.phase,'paused');
+      assert.equal(s.x,snapshot.x);
+      assert.equal(s.g,snapshot.g);
+      s.phase='run';
+    }
+  }
+  assert.equal(s.phase,'clear');
+  assert.equal(s.hits,0);
+  assert.equal(R.runStars(s),3);
+  assert.equal(R.stepRun(s,1/90,false),null);
+  season.runs[i]=R.runStars(s);season.scores[i]=s.points;
+  const noInput=R.newRun(i);
+  noInput.phase='run';
+  for(let j=0;j<5000&&noInput.phase==='run';j++)R.stepRun(noInput,1/90,false);
+  assert.ok(noInput.hits>0,'no-input boat must hit a shoal');
+  assert.ok(noInput.bestChain<s.bestChain);
+  assert.ok(noInput.points<s.points);
+  if(course.gates.filter(g=>g.kind==='shoal').length>=2)assert.equal(noInput.phase,'wreck');
+}
+const trimming=R.newRun();
+trimming.phase='run';trimming.x=3.999;trimming.water=.74;
+assert.equal(R.stepRun(trimming,1/90,true).type,'trim');
+assert.equal(trimming.points,175);
+assert.deepEqual(C.mergeProfile(C.profile(),season).runs,[3,3,3,3,3,3]);
+console.log('PASS six Tide Run routes, no-input penalties, precision bonus, checkpoint and cross-device records.');

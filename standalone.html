@@ -32,6 +32,33 @@ h1{font:700 clamp(24px,6vw,36px)/.97 Georgia,serif;margin:2px 0 0;letter-spacing
 .top-actions button[aria-pressed=false]{color:#aeb6bc;text-decoration:line-through}
 .scene{position:relative;isolation:isolate;overflow:hidden;border:1px solid #6a6971;border-radius:9px 9px 1px 1px;background:radial-gradient(ellipse at 44% 55%,#503b3a55,transparent 47%),repeating-linear-gradient(170deg,#2b4357 0 3px,#273d50 4px 10px,#15293e 11px 15px)}
 #world,.camera-frame,.points,.fx{position:absolute;inset:0;width:100%;height:100%}
+#channel{position:absolute;inset:0;width:100%;height:100%;display:block}
+.race-signal{position:absolute;left:50%;bottom:12%;transform:translateX(-50%);min-width:184px;max-width:90%;pointer-events:none}
+.race-cue{padding:10px 13px;text-align:center;border:1px solid #75dacf70;background:#102434e8;color:#d8fff5;border-radius:6px;font-size:13px;font-weight:800;box-shadow:0 5px 23px #050f1c88}
+#gateTrack{height:3px;margin:4px auto;width:84%;background:#0e2132;overflow:hidden;border-radius:4px}
+#gateFill{display:block;width:100%;height:100%;background:#a4e3d2;transform-origin:left;transform:scaleX(0)}
+.race-cue[data-tone=bridge]{border-color:#f7a27c;color:#ffcfb5}
+.race-cue[data-tone=bump]{border-color:#ff8d6a;color:#ffb088}
+.race-cue[data-tone=pass]{border-color:#91ecce;color:#a1f7c9}
+.race-cue[data-tone=bell]{border-color:#ffe094;color:#ffde97}
+.race-cue[data-tone=trim]{border-color:#ffe094;color:#ffde97}
+.race-cue[data-tone=clear]{opacity:0}
+.race-stats{display:grid;grid-template-columns:repeat(3,1fr);padding:3px 2px 5px;gap:7px}
+.race-stats div{display:grid;gap:1px}
+.race-stats div:nth-child(2){text-align:center}.race-stats div:last-child{text-align:right}
+.race-stats small,.race-caption{font:700 9px/1.2 ui-monospace,Consolas,monospace;letter-spacing:.1em;color:#c1d0d8}
+.race-stats strong{font:700 18px/1.12 Georgia,serif;color:#f8e4bf}
+.race-track{height:5px;background:#111e2e;border-radius:4px;margin:3px 0 8px;overflow:hidden}
+.race-track i{display:block;width:100%;height:100%;transform:scaleX(0);transform-origin:left;background:#8ee0d0}
+.raise{position:relative;overflow:hidden;width:100%;height:54px;touch-action:none;user-select:none;background:#223c50;border-color:#79c5c5;color:#e3fff6;font-weight:800;letter-spacing:.07em;box-shadow:inset 0 -3px #112739}
+.raise span{position:relative;z-index:1}
+.raise i{position:absolute;inset:0;background:#68d4be48;transform:scaleX(.14);transform-origin:left}
+.raise b{position:absolute;bottom:3px;height:3px;background:#f6d48c;border-radius:4px}
+.raise[data-held=true]{background:#31596c;border-color:#b4fff1}
+.race-caption{display:flex;align-items:center;justify-content:space-between;min-height:33px;letter-spacing:.025em}
+.race-caption button{min-height:44px;min-width:44px;font-size:19px;background:transparent;border:0}
+.race-fallback{position:absolute;inset:40% 8% 20%;color:#f0d7af;pointer-events:none}
+.race-fallback span{position:absolute;font-size:27px}.race-fallback span:last-child{right:22%}
 .camera-frame{pointer-events:none;box-shadow:inset 0 0 48px 9px #09101b9c;background:linear-gradient(#11162588,transparent 21%,transparent 84%,#11162666)}
 .camera-frame:before,.camera-frame:after{content:"";position:absolute;width:21px;height:21px;border-color:#f4d7aa60;border-style:solid}
 .camera-frame:before{top:10px;left:10px;border-width:1px 0 0 1px}
@@ -80,6 +107,7 @@ dialog p{font-size:14px;line-height:1.45;margin:6px 0 12px;color:#d8d9d7}
 .panel-actions{display:flex;flex-wrap:wrap;gap:7px}
 .panel-actions button{padding:0 12px}
 .panel-actions .primary{background:#ffc685;border-color:#ffe7b5;color:#211b25;font-weight:800}
+.mode-switch{margin-bottom:12px}
 .stars{color:#ffca86;font-size:24px;letter-spacing:.12em}
 .log-grid{display:grid;gap:5px;margin-bottom:12px}
 .log-grid button{display:grid;grid-template-columns:25px 1fr auto;align-items:center;text-align:left;padding:0 8px;gap:6px}
@@ -108,14 +136,17 @@ dialog p{font-size:14px;line-height:1.45;margin:6px 0 12px;color:#d8d9d7}
     </header>
     <section class="scene" id="scene" aria-label="Interactive harbor scene">
       <canvas id="world" aria-hidden="true"></canvas>
+      <canvas id="channel" aria-hidden="true"></canvas>
       <div class="camera-frame" aria-hidden="true"></div>
       <div class="scene-head"><span id="district"></span><strong id="chapter"></strong></div>
       <div class="stamp" aria-hidden="true">NORTH<br><span>◬</span><br>HARBOR</div>
       <div id="points" class="points"></div>
       <div id="fx" class="fx" aria-hidden="true"></div>
+      <div class="race-signal" aria-live="off"><div id="raceCue" class="race-cue"></div><div id="gateTrack"><i id="gateFill"></i></div></div>
+      <div id="raceFallback" class="race-fallback" hidden><span id="fallbackBoat">◀▰▶</span><span id="fallbackGate">▲</span></div>
       <button type="button" id="signal" class="signal" hidden>✦ <span>View result</span></button>
     </section>
-    <section class="console" aria-label="Harbor controls">
+    <section class="console" id="storyControls" aria-label="Harbor controls">
       <div class="message">
         <span id="tag">FIELD NOTE</span>
         <p id="line" role="status" aria-live="polite"></p>
@@ -130,6 +161,12 @@ dialog p{font-size:14px;line-height:1.45;margin:6px 0 12px;color:#d8d9d7}
         <button type="button" class="guide" id="guide" aria-label="Show a hint"><span aria-hidden="true">✧</span>Hint</button>
       </div>
       <div class="bottom"><span id="inventory">NO TOOLS</span><span id="progress"></span></div>
+    </section>
+    <section class="console race-controls" id="raceControls" aria-label="Tide Run controls" hidden>
+      <div class="race-stats"><div><small>SCORE</small><strong id="raceScore">0</strong></div><div><small>CHAIN</small><strong id="raceChain">0×</strong></div><div><small>BELLS</small><strong id="raceBells">0</strong></div></div>
+      <div class="race-track" aria-hidden="true"><i id="raceProgress"></i></div>
+      <button id="raise" class="raise" type="button" aria-label="Hold to raise the tide"><span id="raiseText">Hold to launch</span><i id="waterFill"></i><b id="trimZone" aria-hidden="true"></b></button>
+      <div class="race-caption"><span id="raceNote">Hold to rise · Release to sink</span><button type="button" id="raceReset" aria-label="Restart this run">↻</button></div>
     </section>
   </main>
   <dialog id="panel" aria-labelledby="dialog-title"><div id="panel-content"></div></dialog>
@@ -246,6 +283,8 @@ function profile(raw={}) {
   return {
     best:CHAPTERS.map((_,i)=>range(raw.best?.[i],3)),
     relics:CHAPTERS.map((_,i)=>raw.relics?.[i]===true),
+    runs:CHAPTERS.map((_,i)=>range(raw.runs?.[i],3)),
+    scores:CHAPTERS.map((_,i)=>range(raw.scores?.[i],9999)),
     mute:raw.mute===true,
     rewards:{like:raw.rewards?.like===true,comment:raw.rewards?.comment===true}
   };
@@ -253,6 +292,7 @@ function profile(raw={}) {
 function mergeProfile(local, remote) {
   const a=profile(local), b=profile(remote);
   return profile({best:a.best.map((v,i)=>Math.max(v,b.best[i])),relics:a.relics.map((v,i)=>v||b.relics[i]),
+    runs:a.runs.map((v,i)=>Math.max(v,b.runs[i])),scores:a.scores.map((v,i)=>Math.max(v,b.scores[i])),
     mute:a.mute,rewards:{like:a.rewards.like||b.rewards.like,comment:a.rewards.comment||b.rewards.comment}});
 }
 function unlocked(p) {
@@ -878,7 +918,192 @@ function bridge({host=()=>globalThis.neonlib,read,write,changed=()=>{},schedule=
 
 
 return {bridge};})();
-const {HarborView}=Art,{HarborAudio}=AudioKit,{bridge}=SDK;
+const R=(()=>{
+const kinds={shoal:'Hold · Clear the shoal',bridge:'Release · Duck the bridge',buoy:'Hold · Ring the buoy'};
+const make=(name,speed,pattern)=>({name,speed,gates:pattern.map(([kind,x])=>({kind,x,label:kinds[kind]}))});
+const COURSES=[
+  make('Ferry Run',2.2,[['shoal',4],['bridge',8],['buoy',12],['shoal',16],['bridge',20]]),
+  make('Bellwater',2.4,[['bridge',3.8],['shoal',7],['buoy',9.7],['bridge',13],['shoal',17],['bridge',21]]),
+  make('Net Race',2.6,[['shoal',4],['shoal',7],['bridge',10.1],['buoy',13.4],['bridge',16.6],['shoal',20],['bridge',23.6]]),
+  make('Salt Channel',2.75,[['buoy',4],['bridge',6.8],['shoal',9.8],['bridge',13],['buoy',16.1],['shoal',19.3],['bridge',22.5]]),
+  make('Mill Rush',3,[['shoal',4],['bridge',6.9],['shoal',9.8],['buoy',12.5],['bridge',15.5],['shoal',18.4],['bridge',21.5],['shoal',24.7]]),
+  make('Last Light Sprint',3.25,[['bridge',4],['shoal',7.2],['bridge',10.4],['buoy',13.4],['shoal',16.2],['bridge',19.2],['shoal',22.2],['bridge',25.2],['buoy',28.4]])
+];
+const limit=(n,a,b)=>Math.max(a,Math.min(b,n));
+const runUnlocked=p=>Math.min(COURSES.length-1,Math.max(0,p.runs.indexOf(0)<0?COURSES.length-1:p.runs.indexOf(0)));
+const runEnd=i=>COURSES[i].gates.at(-1).x+1.8;
+function newRun(i=0){
+  return {i,x:0,water:.14,g:0,hits:0,bells:0,chain:0,bestChain:0,points:0,slow:0,phase:'ready'};
+}
+function restoreRun(raw,profile){
+  if(!raw||!Number.isInteger(raw.i)||raw.i<0||raw.i>runUnlocked(profile))return newRun(runUnlocked(profile));
+  const s=newRun(raw.i), course=COURSES[s.i];
+  const read=(key,max)=>typeof raw[key]==='number'&&Number.isFinite(raw[key])?limit(raw[key],0,max):s[key];
+  s.x=read('x',runEnd(s.i));
+  s.water=read('water',1);
+  s.g=course.gates.filter(g=>g.x<=s.x).length;
+  for(const key of ['hits','bells','chain','bestChain','points'])s[key]=Math.floor(read(key,key==='points'?9999:course.gates.length));
+  s.slow=read('slow',.48);
+  s.phase=s.hits>=2?'wreck':raw.phase==='clear'&&s.x>=runEnd(s.i)?'clear':s.x>0?'paused':'ready';
+  return s;
+}
+function stepRun(s,dt,held){
+  if(s.phase!=='run')return null;
+  const course=COURSES[s.i];
+  const height=held ? .94 : .13;
+  s.water+=(height-s.water)*(1-Math.exp(-dt*(held?3.65:4.25)));
+  s.slow=Math.max(0,s.slow-dt);
+  s.x=Math.min(runEnd(s.i),s.x+dt*course.speed*(s.slow>.001 ? .55 : 1));
+  const gate=course.gates[s.g];
+  if(gate&&s.x>=gate.x){
+    s.g++;
+    const hit=gate.kind==='bridge'?s.water>.47:gate.kind==='shoal'?s.water<.6:false;
+    if(hit){
+      s.hits++;s.chain=0;s.slow=.48;
+      if(s.hits>=2){s.phase='wreck';return {type:'wreck',kind:gate.kind};}
+      return {type:'bump',kind:gate.kind};
+    }
+    if(gate.kind==='buoy'&&s.water<.64)return {type:'miss'};
+    if(gate.kind==='buoy')s.bells++;
+    s.chain++;
+    s.bestChain=Math.max(s.bestChain,s.chain);
+    const trim=gate.kind==='bridge'?s.water>=.19&&s.water<=.34:gate.kind==='shoal'&&s.water>=.68&&s.water<=.83;
+    s.points+=100+Math.min(5,s.chain-1)*25+(gate.kind==='buoy'?100:0)+(trim?75:0);
+    return {type:gate.kind==='buoy'?'bell':trim?'trim':'pass',chain:s.chain};
+  }
+  if(s.x>=runEnd(s.i)){s.phase='clear';return {type:'finish'};}
+  return null;
+}
+function runStars(s){
+  const possible=COURSES[s.i].gates.filter(g=>g.kind==='buoy').length;
+  return 1+Number(s.hits<=1)+Number(s.hits===0&&s.bells===possible);
+}
+
+return {COURSES,runUnlocked,runEnd,newRun,restoreRun,stepRun,runStars};})();
+const ChannelArt=(()=>{
+const {HarborView}=Art;
+
+const Three=globalThis.THREE;
+const lineZ=1.2;
+const waterY=n=>n*1.58-.5;
+
+class ChannelView extends HarborView {
+  resize(){
+    if(!this.renderer)return;
+    const w=this.canvas.clientWidth||1,h=this.canvas.clientHeight||1;
+    const width=Math.max(8.5,Math.min(16,w/h*6.6)),height=width*h/w;
+    this.camera.left=-width/2;this.camera.right=width/2;
+    this.camera.top=height/2;this.camera.bottom=-height/2;
+    this.camera.position.set(6.5,12,24);this.camera.lookAt(1.1,.52,0);
+    this.camera.updateProjectionMatrix();this.camera.updateMatrixWorld();
+    this.renderer.setSize(w,h,false);
+  }
+  buildRoute(s,ch,course){
+    this.index=s.i;this.root.clear();
+    const b=this.root;
+    this.scene.background=new Three.Color(ch.sky);
+    this.scene.fog=new Three.Fog(ch.sky,24,46);
+    this.createWater(ch);
+    this.gates=course.gates.map((gate,i)=>this.gate(gate,i));
+    this.finish=new Three.Group();b.add(this.finish);
+    this.box(this.finish,0,.02,0,.07,.13,4,'ivory');
+    for(const z of [-1,3.5]){
+      this.tube(this.finish,0,.68,z,.075,2.82,'iron');
+      this.lantern(this.finish,0,2.18,z,'green');
+    }
+    for(let i=0;i<8;i++)this.box(this.finish,0,2.26,-1+i*.64,.13,.29,.57,i%2?'iron':'ivory');
+    this.docks=[];
+    for(let i=0;i<7;i++){
+      const group=new Three.Group();b.add(group);
+      const z=-4.15-(i%2)*.6;
+      this.box(group,0,.23,z,4.2,1.32,3.1,'stone');
+      this.box(group,0,.92,z,4.28,.13,3.23,'deck');
+      const tall=1.4+(i%3)*.35;
+      this.box(group,-.16,1.14+tall/2,z,2.71,tall,1.8,i%2?'wood':'roof');
+      this.gable(group,-.16,tall+1.24,z,3.12,.63,2.1);
+      for(const x of [-.89,.08,.99]){
+        this.box(group,x,1.82,z+.918,.41,.46,.055,'iron');
+        this.box(group,x,1.82,z+.96,.27,.31,.036,i%3?'glow':'bulbOff');
+      }
+      this.tube(group,1.67,1.52,z+1.22,.06,1.32,'iron');
+      this.lantern(group,1.67,2.25,z+1.22);
+      this.docks.push(group);
+    }
+    this.craft=this.boat(-1.52,lineZ,.56);
+    this.wake=[];
+    for(let i=0;i<11;i++){
+      const group=new Three.Group();b.add(group);
+      const trail=this.box(group,0,0,0,.24,.015,.023,'foam');trail.rotation.y=(i%2?-1:1)*.48;
+      this.wake.push(group);
+    }
+    this.rain.visible=false;
+    this.resize();
+  }
+  gate(gate,i){
+    const g=new Three.Group();g.position.z=lineZ;this.root.add(g);
+    const meta={g,gate,bob:null};
+    if(gate.kind==='bridge'){
+      for(const z of [-1.08,1.08]){
+        this.box(g,0,.25,z,.36,1.85,.36,'iron');
+        this.box(g,0,1.29,z,.54,.23,.54,'trim');
+        this.lantern(g,0,1.56,z);
+      }
+      this.box(g,0,1.16,0,.41,.22,2.4,'red');
+      for(let j=0;j<7;j++){
+        const stripe=this.box(g,-.213,1.16,-.99+j*.33,.02,.095,.135,'ivory');
+        stripe.rotation.x=.53;
+      }
+    }else if(gate.kind==='shoal'){
+      for(let j=0;j<5;j++){
+        const x=(j%2)*.23-.115,z=-.73+j*.37;
+        this.tube(g,x,-.03,z,.31,.73+(j%2)*.13,'ledge',.59,5).rotation.y=i+j*.8;
+        this.box(g,x,.34+(j%2)*.06,z,.19,.022,.18,'foam');
+      }
+      this.tube(g,-.25,.54,-1.09,.07,1.18,'iron');
+      this.lantern(g,-.25,1.17,-1.09,'green');
+    }else{
+      meta.bob=new Three.Group();g.add(meta.bob);
+      this.tube(meta.bob,0,.02,0,.26,.23,'copper',.67,10);
+      this.lantern(meta.bob,0,.32,0);
+      this.tube(g,0,.19,-.97,.05,1.67,'iron');
+      this.box(g,0,1.02,-.72,.09,.06,.58,'copper');
+    }
+    return meta;
+  }
+  renderRun(s,ch,course,finish,dt,reduced,rewards){
+    if(s.i!==this.index)this.buildRoute(s,ch,course);
+    this.time+=reduced?0:dt;
+    const t=this.time,y=waterY(s.water);
+    this.water.position.y=y;
+    this.water.material.uniforms.clock.value=t+s.x*.26;
+    const impact=s.slow/.48;
+    this.craft.position.y=y+.071;
+    this.craft.rotation.z=impact*Math.sin(t*27)*.18+(reduced?0:Math.sin(t*2.1)*.044);
+    for(const [i,prop] of this.gates.entries()){
+      const x=prop.gate.x-s.x-1.52;
+      prop.g.position.x=x;
+      prop.g.visible=x>-8&&x<15;
+      if(prop.bob){
+        prop.bob.position.y=.76+.067*Math.sin(t*3+i);
+        prop.bob.rotation.z=.13*Math.sin(t*3+i);
+        prop.bob.visible=i>=s.g;
+      }
+    }
+    for(const [i,d] of this.docks.entries())d.position.x=-15+i*4.7-(s.x*.44)%4.7;
+    this.finish.position.x=finish-s.x-1.52;
+    for(const [i,w] of this.wake.entries()){
+      const wave=(s.x*.42+i/11)%1,side=i%2?1:-1;
+      w.position.set(-2.02-wave*1.82,y+.024,lineZ+side*(.21+wave*.7));
+      w.scale.setScalar(.52+wave*.7);
+      w.visible=s.phase==='run';
+    }
+    this.materials.glow.color.setHex(rewards.like?0xff8f57:0xffcb79);
+    this.renderer.render(this.scene,this.camera);
+  }
+}
+
+return {ChannelView};})();
+const {HarborView}=Art,{HarborAudio}=AudioKit,{bridge}=SDK,{ChannelView}=ChannelArt;
 
 const $=id=>document.getElementById(id);
 const KEY='low-tide-signal-v1';
@@ -886,20 +1111,23 @@ let raw;
 try{raw=JSON.parse(localStorage.getItem(KEY)||'null');}catch{}
 let profile=C.profile(raw?.profile);
 let state=C.restore(raw?.state,profile);
+let mode=raw?.mode==='story'?'story':'race';
+let run=R.restoreRun(raw?.run,profile);
 let view,host,frame=0,last=0,guidePoint=null;
+let raceView,raceFallback=false,racePointer=null,raceKey=false,raceBank=0,checkpoint=0,raceFeedback=null;
 let buttons=new Map();
 const reduce=matchMedia('(prefers-reduced-motion: reduce)');
 const audio=new HarborAudio(profile.mute);
 
 function persist(){
-  try{localStorage.setItem(KEY,JSON.stringify({v:1,profile,state}));}catch{}
+  try{localStorage.setItem(KEY,JSON.stringify({v:1,profile,state,run,mode}));}catch{}
 }
 function attach(){
   host=bridge({
     read:()=>C.profile(profile),
     write(value,merge){
       profile=merge?C.mergeProfile(profile,value):C.profile(value);
-      persist();refresh();
+      persist();if(mode==='race')refreshRace();else refresh();
       if($('panel').open&&$('panel').dataset.kind==='log')drawLog();
     },
     changed(event){
@@ -1008,13 +1236,20 @@ function content(kicker,title,body){
   return root;
 }
 function drawLog(){
-  const total=profile.best.reduce((a,b)=>a+b,0),found=profile.relics.filter(Boolean).length;
-  const root=content('HARBOR ARCHIVE','The logbook',total+' / 18 stars · '+found+' / 6 keepsakes');
+  const racing=mode==='race';
+  const total=(racing?profile.runs:profile.best).reduce((a,b)=>a+b,0),found=profile.relics.filter(Boolean).length;
+  const root=content('HARBOR ARCHIVE',racing?'Tide Run':'The logbook',total+' / 18 stars'+(racing?' across six courses':' · '+found+' / 6 keepsakes'));
+  const modes=document.createElement('div');modes.className='panel-actions mode-switch';
+  modes.append(makeButton('Tide Run',()=>selectMode('race'),racing),makeButton('Story puzzles',()=>selectMode('story'),!racing));root.append(modes);
   const list=document.createElement('div');list.className='log-grid';root.append(list);
-  C.CHAPTERS.forEach((ch,i)=>{
-    const b=makeButton('',()=>{if(i===state.index&&!state.cleared)close();else newChapter(i);});
-    b.disabled=i>C.unlocked(profile);
-    for(const text of [String(i+1).padStart(2,'0'),ch.name,b.disabled?'LOCKED':'★'.repeat(profile.best[i])+'☆'.repeat(3-profile.best[i])]){
+  (racing?R.COURSES:C.CHAPTERS).forEach((ch,i)=>{
+    const b=makeButton('',()=>{
+      if(racing){if(i===run.i&&!runEnded())close();else resetRace(i);}
+      else if(i===state.index&&!state.cleared)close();else newChapter(i);
+    });
+    b.disabled=i>(racing?R.runUnlocked(profile):C.unlocked(profile));
+    const best=racing?profile.runs[i]:profile.best[i];
+    for(const text of [String(i+1).padStart(2,'0'),ch.name,b.disabled?'LOCKED':'★'.repeat(best)+'☆'.repeat(3-best)]){
       const span=document.createElement('span');span.textContent=text;b.append(span);
     }
     list.append(b);
@@ -1043,12 +1278,138 @@ function drawResult(){
   actions.append(makeButton('Replay',()=>newChapter(state.index)),makeButton('Back',close));
 }
 function show(kind,draw){
+  if(mode==='race')pauseRace();
   $('panel').dataset.kind=kind;draw();
   if(!$('panel').open)$('panel').showModal();
   audio.silence();
 }
 function showLog(){show('log',drawLog);}
 function close(){$('panel').close();allowAudio();}
+
+function selectMode(next){
+  if(mode===next)return;
+  host.end();host.prepare();
+  mode=next;
+  syncMode();
+  drawLog();persist();restartFrame();
+}
+function syncMode(){
+  const racing=mode==='race';
+  $('storyControls').hidden=racing;
+  $('raceControls').hidden=!racing;
+  $('points').hidden=racing;
+  $('channel').hidden=!racing||raceFallback;
+  $('world').hidden=racing||!view;
+  $('raceCue').hidden=!racing;
+  $('gateTrack').hidden=!racing;
+  $('raceFallback').hidden=!racing||!raceFallback;
+  $('scene').classList.toggle('fallback',!racing&&!view);
+  if(racing){
+    if(!raceView&&!raceFallback)try{raceView=new ChannelView($('channel'));}catch{enableRaceFallback();}
+    raceView?.resize();
+    refreshRace();
+  }else{
+    view?.resize();refresh();
+  }
+}
+function held(){return racePointer!==null||raceKey;}
+function runEnded(){return run.phase==='clear'||run.phase==='wreck';}
+function refreshRace(){
+  const course=R.COURSES[run.i],target=course.gates[run.g];
+  $('district').textContent='TIDE RUN · '+String(run.i+1).padStart(2,'0')+' / 06';
+  $('chapter').textContent=course.name;
+  $('raceScore').textContent=run.points.toLocaleString('en');
+  $('raceChain').textContent=run.chain+'×';
+  $('raceBells').textContent=run.bells+'/'+course.gates.filter(g=>g.kind==='buoy').length;
+  $('raceProgress').style.transform='scaleX('+run.x/R.runEnd(run.i)+')';
+  $('waterFill').style.transform='scaleX('+run.water+')';
+  $('raise').dataset.held=String(held());
+  $('raise').disabled=runEnded();
+  $('raiseText').textContent=run.phase==='ready'?'HOLD TO LAUNCH':run.phase==='paused'?'HOLD TO RESUME':run.phase==='clear'?'FINISH LINE':run.phase==='wreck'?'RUN ENDED':held()?'RISING TIDE':'FALLING TIDE';
+  const cue=$('raceCue'),showing=raceFeedback&&performance.now()<raceFeedback.until;
+  cue.textContent=showing?raceFeedback.text:target?target.label:'Finish ahead';
+  cue.dataset.tone=runEnded()?'clear':showing?raceFeedback.type:target?.kind||'pass';
+  const travel=target?(target.x-run.x)/(target.x-(course.gates[run.g-1]?.x||0)):0;
+  $('gateFill').style.transform='scaleX('+Math.max(0,1-travel)+')';
+  $('gateTrack').hidden=runEnded();
+  $('trimZone').hidden=runEnded()||!target||target.kind==='buoy';
+  $('trimZone').style.left=target?.kind==='bridge'?'19%':'68%';
+  $('trimZone').style.width='15%';
+  $('raceNote').textContent=run.phase==='paused'?'Paused · Hold to resume':run.hits===1?'One bump left · Watch the next crossing':'Hold to rise · Release to sink';
+  $('signal').hidden=!runEnded();
+  if(raceFallback){
+    $('fallbackBoat').style.bottom=(run.water*63)+'%';
+    $('fallbackGate').textContent=target?.kind==='bridge'?'▬':target?.kind==='buoy'?'✦':'▲';
+  }
+}
+function enableRaceFallback(){
+  raceFallback=true;raceView=null;
+  $('channel').hidden=true;
+  $('raceFallback').hidden=false;
+}
+function launchRace(){
+  if(mode!=='race'||$('panel').open||runEnded())return;
+  if(run.phase!=='run'){
+    run.phase='run';raceBank=0;last=0;
+    host.start();allowAudio();persist();
+  }
+  refreshRace();
+}
+function pauseRace(){
+  racePointer=null;raceKey=false;raceBank=0;
+  if(run.phase==='run'){run.phase='paused';persist();}
+  if(mode==='race')refreshRace();
+}
+function resetRace(index=run.i){
+  if(index>R.runUnlocked(profile))return;
+  if(!runEnded())host.end();
+  host.prepare();run=R.newRun(index);raceFeedback=null;
+  racePointer=null;raceKey=false;raceBank=0;
+  close();persist();refreshRace();
+}
+function raceResult(){
+  const stars=R.runStars(run),course=R.COURSES[run.i];
+  if(run.phase==='wreck'){
+    const root=content('BACK TO THE DOCK',course.name,'Two bumps ended the run. Watch the next crossing and change the water level before the boat reaches it.');
+    const actions=document.createElement('div');actions.className='panel-actions';root.append(actions);
+    actions.append(makeButton('Try again ›',()=>resetRace(),true),makeButton('Harbor log',showLog));
+    return;
+  }
+  const root=content('FINISH LINE',course.name,run.points.toLocaleString('en')+' points · Best chain '+run.bestChain+'× · '+run.hits+' bumps');
+  const row=document.createElement('div');row.className='stars';row.textContent='★'.repeat(stars)+'☆'.repeat(3-stars);root.append(row);
+  const actions=document.createElement('div');actions.className='panel-actions';root.append(actions);
+  if(run.i<R.COURSES.length-1)actions.append(makeButton('Next course ›',()=>resetRace(run.i+1),true));
+  else actions.append(makeButton('Harbor log',showLog,true));
+  actions.append(makeButton('Replay',()=>resetRace()),makeButton('Back',close));
+}
+function raceEvent(event){
+  if(event.type==='wreck'){
+    host.end();persist();audio.cue('wrong');return;
+  }
+  if(event.type==='finish'){
+    profile.runs[run.i]=Math.max(profile.runs[run.i],R.runStars(run));
+    profile.scores[run.i]=Math.max(profile.scores[run.i],run.points);
+    host.end();host.save();persist();audio.cue('clear');return;
+  }
+  const labels={pass:'Clear · '+run.chain+'× chain',trim:'Perfect tide · +75',bump:'Bump · Chain lost',bell:'Bell rung · +100',miss:'Buoy missed'};
+  raceFeedback={text:labels[event.type],type:event.type,until:performance.now()+480};
+  if(event.type!=='miss')audio.cue(event.type==='bump'?'wrong':['bell','trim'].includes(event.type)?'take':'tide');
+  if(event.type==='bump'&&!reduce.matches)try{navigator.vibrate?.(28);}catch{}
+  persist();
+}
+function updateRace(now,dt){
+  if(run.phase==='run'){
+    raceBank+=dt;
+    while(raceBank>=1/90&&run.phase==='run'){
+      raceBank-=1/90;
+      const event=R.stepRun(run,1/90,held());
+      if(event)raceEvent(event);
+    }
+    if(now-checkpoint>=185){checkpoint=now;persist();}
+  }
+  refreshRace();
+  raceView?.renderRun(run,C.CHAPTERS[run.i],R.COURSES[run.i],R.runEnd(run.i),dt,reduce.matches,profile.rewards);
+}
 
 function placePoints(){
   const scene=$('scene'), w=scene.clientWidth, h=scene.clientHeight;
@@ -1073,22 +1434,45 @@ function placePoints(){
 }
 function render(now){
   frame=0;
-  if(!view||document.hidden)return;
+  if(document.hidden)return;
   if(last&&now-last<29){frame=requestAnimationFrame(render);return;}
   const dt=last?Math.min(.075,(now-last)/1000):.016;
   last=now;
-  view.draw(chapter(),state,dt,reduce.matches,profile.rewards);
-  if(!state.cleared)placePoints();
+  if(mode==='race')updateRace(now,dt);
+  else if(view){
+    view.draw(chapter(),state,dt,reduce.matches,profile.rewards);
+    if(!state.cleared)placePoints();
+  }
   frame=requestAnimationFrame(render);
 }
-function restartFrame(){if(view&&!frame){last=0;frame=requestAnimationFrame(render);}}
+function restartFrame(){if(!frame){last=0;frame=requestAnimationFrame(render);}}
 function fallback(){
   view=null;
-  $('scene').classList.add('fallback');$('world').hidden=true;
+  if(mode==='story')$('scene').classList.add('fallback');
+  $('world').hidden=true;
 }
 try{view=new HarborView($('world'));}catch{fallback();}
 $('world').addEventListener('webglcontextlost',event=>{event.preventDefault();fallback();});
-if(typeof ResizeObserver==='function')new ResizeObserver(()=>view?.resize()).observe($('scene'));
+if(typeof ResizeObserver==='function')new ResizeObserver(()=>{if(mode==='race')raceView?.resize();else view?.resize();}).observe($('scene'));
+$('channel').addEventListener('webglcontextlost',event=>{event.preventDefault();enableRaceFallback();});
+const raise=$('raise');
+raise.addEventListener('pointerdown',event=>{
+  if(!event.isPrimary||event.button!==0||runEnded())return;
+  racePointer=event.pointerId;
+  raise.setPointerCapture(event.pointerId);launchRace();
+});
+for(const name of ['pointerup','pointercancel','lostpointercapture'])raise.addEventListener(name,event=>{
+  if(event.pointerId===racePointer)racePointer=null;
+});
+raise.addEventListener('click',event=>{if(event.detail===0&&run.phase!=='run')launchRace();});
+$('raceReset').addEventListener('click',()=>{
+  if(run.phase==='ready'||runEnded()){resetRace();return;}
+  show('restart',()=>{
+    const root=content('FRESH RUN','Restart this course?','Your best score and stars stay in the logbook.');
+    const actions=document.createElement('div');actions.className='panel-actions';root.append(actions);
+    actions.append(makeButton('Restart',()=>resetRace(),true),makeButton('Back',close));
+  });
+});
 document.querySelectorAll('[data-tide]').forEach(button=>button.addEventListener('click',()=>commitTide(Number(button.dataset.tide))));
 $('guide').addEventListener('click',()=>{
   const hint=C.guide(state);
@@ -1096,28 +1480,36 @@ $('guide').addEventListener('click',()=>{
   guidePoint=hint.id;setNote('FIELD HINT',hint.text);persist();refresh();
 });
 $('book').addEventListener('click',showLog);
-$('signal').addEventListener('click',()=>show('result',drawResult));
+$('signal').addEventListener('click',()=>show('result',mode==='race'?raceResult:drawResult));
 $('sound').addEventListener('click',()=>{
   profile.mute=!profile.mute;audio.muted=profile.mute;
   if(profile.mute)audio.silence();else allowAudio();
-  persist();refresh();
+  persist();if(mode==='race')refreshRace();else refresh();
 });
 $('panel').addEventListener('close',()=>{$('panel').dataset.kind='';});
 document.addEventListener('keydown',event=>{
   if($('panel').open||event.repeat||event.altKey||event.ctrlKey||event.metaKey)return;
+  if(mode==='race'){
+    if(event.code==='Space'&&(event.target===raise||!event.target.closest?.('button'))){
+      event.preventDefault();raceKey=true;launchRace();
+    }
+    return;
+  }
   if(['1','2','3'].includes(event.key)){event.preventDefault();commitTide(Number(event.key)-1);}
 });
+document.addEventListener('keyup',event=>{if(event.code==='Space')raceKey=false;});
+window.addEventListener('blur',()=>{if(mode==='race'){pauseRace();audio.silence();}});
 document.addEventListener('visibilitychange',()=>{
-  if(document.hidden){audio.silence();persist();}
+  if(document.hidden){if(mode==='race')pauseRace();audio.silence();persist();}
   else{restartFrame();audio.surf(!profile.mute&&!$('panel').open);}
 });
-window.addEventListener('pagehide',()=>{persist();audio.silence();host.stop();});
+window.addEventListener('pagehide',()=>{if(mode==='race')pauseRace();persist();audio.silence();host.stop();});
 window.addEventListener('pageshow',event=>{if(event.persisted)attach();restartFrame();});
 openPoints();
 if(state.cleared)setNote('SIGNAL RESTORED',chapter().ending);
 else if(state.moves)setNote('FIELD NOTE','Your waterline and recovered tools are where you left them.');
 else setNote('FIELD NOTE',chapter().opening);
-attach();refresh();restartFrame();
+attach();syncMode();restartFrame();
 
 })();</script>
 </body>

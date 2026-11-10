@@ -76,6 +76,8 @@ export function profile(raw={}) {
   return {
     best:CHAPTERS.map((_,i)=>range(raw.best?.[i],3)),
     relics:CHAPTERS.map((_,i)=>raw.relics?.[i]===true),
+    runs:CHAPTERS.map((_,i)=>range(raw.runs?.[i],3)),
+    scores:CHAPTERS.map((_,i)=>range(raw.scores?.[i],9999)),
     mute:raw.mute===true,
     rewards:{like:raw.rewards?.like===true,comment:raw.rewards?.comment===true}
   };
@@ -83,6 +85,7 @@ export function profile(raw={}) {
 export function mergeProfile(local, remote) {
   const a=profile(local), b=profile(remote);
   return profile({best:a.best.map((v,i)=>Math.max(v,b.best[i])),relics:a.relics.map((v,i)=>v||b.relics[i]),
+    runs:a.runs.map((v,i)=>Math.max(v,b.runs[i])),scores:a.scores.map((v,i)=>Math.max(v,b.scores[i])),
     mute:a.mute,rewards:{like:a.rewards.like||b.rewards.like,comment:a.rewards.comment||b.rewards.comment}});
 }
 export function unlocked(p) {

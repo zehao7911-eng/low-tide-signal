@@ -1,5 +1,13 @@
 # Low Tide Signal
 
+## Tide Run
+
+Hold the large pad (or Space) to launch. Keep holding to lift the boat over a shoal and reach a bell. Release to lower the water under a bridge. The bar under the cue shows the approach to the next crossing. Match the gold range on the pad at the crossing for a precision bonus. The first hit breaks the chain and slows the boat briefly. A second hit ends the attempt. Each of the six courses can be replayed for its best score and stars.
+
+The harbor log switches between Tide Run and Story puzzles. It pauses a run, and a restored in-progress run waits for input. Existing story progress and settings keep the same save key. Tide Run has its own course records and checkpoint in that save.
+
+## Story puzzles
+
 Tap the tide dial to raise or lower the water, then tap a marked item to recover it or operate a mechanism. Restore six harbor signals and find an optional keepsake at each installation. Open the logbook to replay unlocked chapters. Inspect a submerged target to see which tide it needs. A hint highlights a useful next step and caps that attempt at two stars.
 
 Play with touch or mouse, or press 1, 2 and 3 to set the tide and use Tab and Enter to select hotspots. The controls remain usable if WebGL is unavailable. Music, surf and effects are synthesized locally and start after an interaction. Muting and chapter progress persist in the browser.
@@ -12,4 +20,4 @@ Open the root `index.html` directly or use a static server. `standalone.html` is
 
 ## GameWave
 
-A successful tide change or object interaction starts the host round. Restoring a signal ends it. A saved unfinished chapter starts the next host session on its next committed action. The local checkpoint is saved in `low-tide-signal-v1`. Only this game's profile merges with its own recognized cloud envelope. Confirmed positive likes unlock copper lanterns and confirmed direct comments unlock a harbor pennant. The rewards are optional and deduplicated within the saved profile. The [official integration document](https://rg975ojk5z.feishu.cn/wiki/MQg7wMknzieOkukxyWVc4UB0nDh) was rechecked November 11, 2026. The mock tests do not establish actual GameWave host behavior.
+A Tide Run launch or resume starts a host round, and reaching the finish ends it. In Story puzzles, a successful tide change or object interaction starts the host round and restoring a signal ends it. A saved unfinished chapter starts the next host session on its next committed action. The local checkpoint is saved in `low-tide-signal-v1`. Only this game's profile merges with its own recognized cloud envelope. Confirmed positive likes unlock copper lanterns and confirmed direct comments unlock a harbor pennant in Story puzzles. The rewards are optional and deduplicated within the saved profile. The [official integration document](https://rg975ojk5z.feishu.cn/wiki/MQg7wMknzieOkukxyWVc4UB0nDh) shows an October 30 revision. The mock tests do not establish actual GameWave host behavior.

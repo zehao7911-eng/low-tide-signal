@@ -16,14 +16,17 @@
     </header>
     <section class="scene" id="scene" aria-label="Interactive harbor scene">
       <canvas id="world" aria-hidden="true"></canvas>
+      <canvas id="channel" aria-hidden="true"></canvas>
       <div class="camera-frame" aria-hidden="true"></div>
       <div class="scene-head"><span id="district"></span><strong id="chapter"></strong></div>
       <div class="stamp" aria-hidden="true">NORTH<br><span>◬</span><br>HARBOR</div>
       <div id="points" class="points"></div>
       <div id="fx" class="fx" aria-hidden="true"></div>
+      <div class="race-signal" aria-live="off"><div id="raceCue" class="race-cue"></div><div id="gateTrack"><i id="gateFill"></i></div></div>
+      <div id="raceFallback" class="race-fallback" hidden><span id="fallbackBoat">◀▰▶</span><span id="fallbackGate">▲</span></div>
       <button type="button" id="signal" class="signal" hidden>✦ <span>View result</span></button>
     </section>
-    <section class="console" aria-label="Harbor controls">
+    <section class="console" id="storyControls" aria-label="Harbor controls">
       <div class="message">
         <span id="tag">FIELD NOTE</span>
         <p id="line" role="status" aria-live="polite"></p>
@@ -38,6 +41,12 @@
         <button type="button" class="guide" id="guide" aria-label="Show a hint"><span aria-hidden="true">✧</span>Hint</button>
       </div>
       <div class="bottom"><span id="inventory">NO TOOLS</span><span id="progress"></span></div>
+    </section>
+    <section class="console race-controls" id="raceControls" aria-label="Tide Run controls" hidden>
+      <div class="race-stats"><div><small>SCORE</small><strong id="raceScore">0</strong></div><div><small>CHAIN</small><strong id="raceChain">0×</strong></div><div><small>BELLS</small><strong id="raceBells">0</strong></div></div>
+      <div class="race-track" aria-hidden="true"><i id="raceProgress"></i></div>
+      <button id="raise" class="raise" type="button" aria-label="Hold to raise the tide"><span id="raiseText">Hold to launch</span><i id="waterFill"></i><b id="trimZone" aria-hidden="true"></b></button>
+      <div class="race-caption"><span id="raceNote">Hold to rise · Release to sink</span><button type="button" id="raceReset" aria-label="Restart this run">↻</button></div>
     </section>
   </main>
   <dialog id="panel" aria-labelledby="dialog-title"><div id="panel-content"></div></dialog>

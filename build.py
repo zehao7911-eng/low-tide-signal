@@ -10,6 +10,8 @@ def module(filename, binding=None):
     exports = re.findall(r'^export (?:function|class|const) (\w+)', source, re.M)
     source = re.sub(r'^import .*;\n', '', source, flags=re.M)
     source = re.sub(r'^export ', '', source, flags=re.M)
+    if binding == 'ChannelArt':
+        source = 'const {HarborView}=Art;\n' + source
     if binding:
         return f"const {binding}=(()=>{{\n{source}\nreturn {{{','.join(exports)}}};}})();\n"
     return source
@@ -19,8 +21,11 @@ style = (root / 'style.css').read_text(encoding='utf-8')
 three = (root / 'vendor/three.min.js').read_text(encoding='utf-8')
 notice = (root / 'vendor/THREE-LICENSE.txt').read_text(encoding='utf-8')
 
-code = ''.join(module(n, bind) for n, bind in [('core.mjs', 'C'), ('art.mjs', 'Art'), ('audio.mjs', 'AudioKit'), ('sdk.mjs', 'SDK')])
-code += 'const {HarborView}=Art,{HarborAudio}=AudioKit,{bridge}=SDK;\n' + module('app.mjs')
+code = ''.join(module(n, bind) for n, bind in [
+    ('core.mjs', 'C'), ('art.mjs', 'Art'), ('audio.mjs', 'AudioKit'), ('sdk.mjs', 'SDK'),
+    ('channel.mjs', 'R'), ('channel-view.mjs', 'ChannelArt')
+])
+code += 'const {HarborView}=Art,{HarborAudio}=AudioKit,{bridge}=SDK,{ChannelView}=ChannelArt;\n' + module('app.mjs')
 html = (root / 'index-source.html').read_text(encoding='utf-8')
 html = html.replace('<link rel="stylesheet" href="style.css">', '<style>\n' + style + '\n</style>')
 html = html.replace('<script src="vendor/three.min.js"></script>', '<script>\n/*\n' + notice + '\n*/\n' + three + '\n</script>')
